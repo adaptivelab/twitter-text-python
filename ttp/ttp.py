@@ -41,6 +41,7 @@ LIST_REGEX = re.compile(LIST_PRE_CHARS + '(' + AT_SIGNS + '+)' + LIST_END_CHARS,
 USERNAME_REGEX = re.compile(ur'\B' + AT_SIGNS + LIST_END_CHARS, re.IGNORECASE)
 REPLY_REGEX = re.compile(ur'^(?:' + SPACES + ur')*' + AT_SIGNS
                          + ur'([a-z0-9_]{1,20}).*', re.IGNORECASE)
+BROADCAST_REGEX = re.compile('.' + AT_SIGNS + LIST_END_CHARS, re.IGNORECASE)
 
 # Hashtags
 HASHTAG_EXP = ur'(^|[^0-9A-Z&/]+)(#|\uff03)([0-9A-Z_]*[A-Z_]+[%s]*)' % UTF_CHARS
@@ -109,11 +110,12 @@ class ParseResult(object):
 
     '''
 
-    def __init__(self, urls, users, reply, lists, tags, html):
+    def __init__(self, urls, users, reply, broadcast, lists, tags, html):
         self.urls = urls if urls else []
         self.users = users if users else []
         self.lists = lists if lists else []
         self.reply = reply if reply else None
+        self.broadcast = broadcast if broadcast else None
         self.tags = tags if tags else []
         self.html = html
 
@@ -136,8 +138,11 @@ class Parser(object):
         reply = REPLY_REGEX.match(text)
         reply = reply.groups(0)[0] if reply is not None else None
 
+        broadcast = BROADCAST_REGEX.search(text)
+        broadcast = broadcast.groups(0)[0] if broadcast is not None else None
+
         parsed_html = self._html(text) if html else self._text(text)
-        return ParseResult(self._urls, self._users, reply,
+        return ParseResult(self._urls, self._users, reply, broadcast,
                            self._lists, self._tags, parsed_html)
 
     def _text(self, text):
