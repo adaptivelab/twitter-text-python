@@ -86,6 +86,15 @@ class ParseResult(object):
         Note: It's generally better to rely on the Tweet JSON/XML in order to
         find out if it's a reply or not.
 
+    - broadcast
+        A string containing the username this tweet was a broadcast mention to
+        (e.g. preceeded by a dot to ensure that mention is broadcast even to
+            non-followers of that username)
+
+    - retweet
+        A string containing the username this tweet was a retweet of (as indicated by
+            either old-style RT or encased in quotes)
+
     - lists
         A list containing all the valid lists in the Tweet.
         Each list item is a tuple in the format (username, listname).

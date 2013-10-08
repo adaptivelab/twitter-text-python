@@ -509,6 +509,35 @@ class TWPTests(unittest.TestCase):
         self.assertEqual(result.users, [u'username'])
         self.assertEqual(result.reply, None)
 
+    # Broadcast mentions
+    def test_username_broadcast_mention_at_start(self):
+        result = self.parser.parse(u'.@username')
+        self.assertEqual(result.html, u'.<a href="http://twitter.com/username">@username</a>')
+        self.assertEqual(result.users, [u'username'])
+        self.assertEqual(result.broadcast, u'username')
+
+    def test_username_broadcast_mention_in_middle(self):
+        result = self.parser.parse(u'something .@username')
+        self.assertEqual(result.html, u'something .<a href="http://twitter.com/username">@username</a>')
+        self.assertEqual(result.users, [u'username'])
+        self.assertEqual(result.broadcast, u'username')
+
+    # Retweets
+    def test_username_old_style_retweet(self):
+        result = self.parser.parse(u'retweet RT @username something')
+        self.assertEqual(result.html, u'retweet RT <a href="http://twitter.com/username">@username</a> something')
+        self.assertEqual(result.retweet, u'username')
+
+    def test_username_quoted_retweet(self):
+        result = self.parser.parse(u'retweet "@username something"')
+        self.assertEqual(result.html, u'retweet "<a href="http://twitter.com/username">@username</a> something"')
+        self.assertEqual(result.retweet, u'username')
+
+    def test_username_curly_quoted_retweet(self):
+        result = self.parser.parse(u'retweet “@username something”')
+        self.assertEqual(result.html, u'retweet “<a href="http://twitter.com/username">@username</a> something”')
+        self.assertEqual(result.retweet, u'username')
+
     # List tests ---------------------------------------------------------------
     # --------------------------------------------------------------------------
     def test_list_preceeded(self):
