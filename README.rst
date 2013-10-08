@@ -36,6 +36,17 @@ Usage::
 
 If you need different HTML output just subclass and override the ``format_*`` methods.
 
+"broadcast" mentions and old-style retweets are now available as well:
+
+    >>> from ttp import ttp
+    >>> p = ttp.Parser()
+    >>> result = p.parse(".@eadmundo has added broadcast mentions!")
+    >>> result.broadcast
+    'eadmundo'
+    >>> result = p.parse("RT @eadmundo, also old-style retweets")
+    >>> result.retweet
+    'eadmundo'
+
 You can also ask for the span tags to be returned for each entity::
 
     >>> p = ttp.Parser(include_spans=True)
