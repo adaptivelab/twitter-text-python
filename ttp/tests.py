@@ -528,6 +528,11 @@ class TWPTests(unittest.TestCase):
         self.assertEqual(result.html, u'retweet RT <a href="http://twitter.com/username">@username</a> something')
         self.assertEqual(result.retweet, u'username')
 
+    def test_username_old_style_retweet_at_beginning(self):
+        result = self.parser.parse(u'RT @username something')
+        self.assertEqual(result.html, u'RT <a href="http://twitter.com/username">@username</a> something')
+        self.assertEqual(result.retweet, u'username')
+
     def test_username_quoted_retweet(self):
         result = self.parser.parse(u'retweet "@username something"')
         self.assertEqual(result.html, u'retweet "<a href="http://twitter.com/username">@username</a> something"')
@@ -536,6 +541,16 @@ class TWPTests(unittest.TestCase):
     def test_username_curly_quoted_retweet(self):
         result = self.parser.parse(u'retweet “@username something”')
         self.assertEqual(result.html, u'retweet “<a href="http://twitter.com/username">@username</a> something”')
+        self.assertEqual(result.retweet, u'username')
+
+    def test_username_quoted_retweet_at_beginning(self):
+        result = self.parser.parse(u'"@username something"')
+        self.assertEqual(result.html, u'"<a href="http://twitter.com/username">@username</a> something"')
+        self.assertEqual(result.retweet, u'username')
+
+    def test_username_curly_quoted_retweet_at_beginning(self):
+        result = self.parser.parse(u'“@username something”')
+        self.assertEqual(result.html, u'“<a href="http://twitter.com/username">@username</a> something”')
         self.assertEqual(result.retweet, u'username')
 
     # List tests ---------------------------------------------------------------
