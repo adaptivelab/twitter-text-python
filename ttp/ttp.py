@@ -30,6 +30,7 @@ __version__ = "1.0.1.0"
 AT_SIGNS = ur'[@\uff20]'
 UTF_CHARS = ur'a-z0-9_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff'
 SPACES = ur'[\u0020\u00A0\u1680\u180E\u2002-\u202F\u205F\u2060\u3000]'
+QUOTES = ur'[\u0022\u201C]'
 
 # Lists
 LIST_PRE_CHARS = ur'([^a-z0-9_]|^)'
@@ -42,6 +43,7 @@ USERNAME_REGEX = re.compile(ur'\B' + AT_SIGNS + LIST_END_CHARS, re.IGNORECASE)
 REPLY_REGEX = re.compile(ur'^(?:' + SPACES + ur')*' + AT_SIGNS
                          + ur'([a-z0-9_]{1,20}).*', re.IGNORECASE)
 BROADCAST_REGEX = re.compile('.' + AT_SIGNS + LIST_END_CHARS, re.IGNORECASE)
+RETWEET_REGEX = re.compile('(?:RT' + SPACES + '|' + QUOTES + ')' + AT_SIGNS + LIST_END_CHARS, re.IGNORECASE)
 
 # Hashtags
 HASHTAG_EXP = ur'(^|[^0-9A-Z&/]+)(#|\uff03)([0-9A-Z_]*[A-Z_]+[%s]*)' % UTF_CHARS
@@ -110,12 +112,13 @@ class ParseResult(object):
 
     '''
 
-    def __init__(self, urls, users, reply, broadcast, lists, tags, html):
+    def __init__(self, urls, users, reply, broadcast, retweet, lists, tags, html):
         self.urls = urls if urls else []
         self.users = users if users else []
         self.lists = lists if lists else []
         self.reply = reply if reply else None
         self.broadcast = broadcast if broadcast else None
+        self.retweet = retweet if retweet else None
         self.tags = tags if tags else []
         self.html = html
 
@@ -141,8 +144,11 @@ class Parser(object):
         broadcast = BROADCAST_REGEX.search(text)
         broadcast = broadcast.groups(0)[0] if broadcast is not None else None
 
+        retweet = RETWEET_REGEX.search(text)
+        retweet = retweet.groups(0)[0] if retweet is not None else None
+
         parsed_html = self._html(text) if html else self._text(text)
-        return ParseResult(self._urls, self._users, reply, broadcast,
+        return ParseResult(self._urls, self._users, reply, broadcast, retweet,
                            self._lists, self._tags, parsed_html)
 
     def _text(self, text):
